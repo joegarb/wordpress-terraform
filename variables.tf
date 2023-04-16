@@ -5,7 +5,7 @@ variable "tags" {
 }
 variable "prefix" {
   description = "Prefix for all the resources to be created. Please note thst 2 allows only lowercase alphanumeric characters and hyphen"
-  default     = "wordpress"
+  default     = "tf"
 }
 
 variable "site_domain" {
