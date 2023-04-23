@@ -1,5 +1,3 @@
-
-
 module "acm" {
   source      = "terraform-aws-modules/acm/aws"
   version     = "~> v2.0"
@@ -43,7 +41,6 @@ resource "aws_cloudfront_distribution" "this" {
       cookies {
         forward = "all"
       }
-
     }
 
     viewer_protocol_policy = "redirect-to-https"
@@ -106,7 +103,6 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
-
   viewer_certificate {
     acm_certificate_arn      = module.acm.this_acm_certificate_arn
     ssl_support_method       = "sni-only"
@@ -139,6 +135,3 @@ resource "aws_cloudfront_distribution" "this" {
     aws_ecs_service.this
   ]
 }
-
-
-

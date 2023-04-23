@@ -50,7 +50,6 @@ resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {
   policy_arn = aws_iam_policy.task_execution_policy.arn
 }
 
-
 resource "aws_iam_role" "task_role" {
   name = "${var.prefix}-task-role-${var.environment}"
   tags = var.tags
@@ -99,7 +98,6 @@ resource "aws_iam_role_policy_attachment" "task_policy_attach" {
   role       = aws_iam_role.task_role.name
   policy_arn = aws_iam_policy.task_policy.arn
 }
-
 
 resource "aws_ecs_cluster" "this" {
   name = "${var.prefix}-${var.environment}"
@@ -151,7 +149,6 @@ resource "aws_ecs_service" "this" {
     ignore_changes = [desired_count]
   }
 }
-
 
 resource "aws_ecs_task_definition" "this" {
   family                   = "${var.prefix}-${var.environment}"
@@ -288,7 +285,6 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization_low" {
 
   alarm_actions = [aws_appautoscaling_policy.scale_down.arn]
 }
-
 
 resource "aws_appautoscaling_target" "this" {
   max_capacity       = var.max_task

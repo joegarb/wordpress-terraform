@@ -3,7 +3,6 @@ data "aws_route53_zone" "this" {
   name = replace(var.site_domain, "/.*\\b(\\w+\\.\\w+)\\.?$/", "$1") # gets domain from subdomain e.g. "foo.example.com" => "example.com"
 }
 
-
 ## Route53
 # Add an IPv4 DNS record pointing to the CloudFront distribution
 resource "aws_route53_record" "ipv4" {

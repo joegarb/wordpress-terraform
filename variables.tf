@@ -3,6 +3,7 @@ variable "tags" {
   type        = map
   default     = {}
 }
+
 variable "prefix" {
   description = "Prefix for all the resources to be created. Please note thst 2 allows only lowercase alphanumeric characters and hyphen"
   default     = "tf"
@@ -11,6 +12,7 @@ variable "prefix" {
 variable "site_domain" {
   description = "The primary domain name of the website"
 }
+
 variable "public_alb_domain" {
   description = "The public domian name of the ALB"
 }
@@ -29,6 +31,7 @@ variable "desired_count" {
   description = "The number of instances of fargate tasks to keep running"
   default     = "1"
 }
+
 variable "log_retention_in_days" {
   description = "The number of days to retain cloudwatch log"
   default     = "1"
@@ -38,6 +41,7 @@ variable "vpc_cidr" {
   description = "The CIDR block for the VPC"
   default     = "10.0.0.0/16"
 }
+
 variable "public_subnet_cidrs" {
   description = "List of CIDR blocks for public subnets"
   default     = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
@@ -67,20 +71,25 @@ variable "db_max_capacity" {
   description = "The maximum Aurora capacity unit of the db. Ref - https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html"
   default     = "1"
 }
+
 variable "db_min_capacity" {
   description = "The minimum Aurora capacity unit of the db. Ref - https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html"
   default     = "1"
 }
+
 variable "db_master_username" {
   description = "Master username of the db"
 }
+
 variable "db_master_password" {
   description = "Master password of the db"
 }
+
 variable "db_engine_version" {
   description = "The database engine version"
   default     = "5.6.10a"
 }
+
 variable "db_auto_pause" {
   description = "Whether to enable auto pause"
   default     = true
@@ -90,10 +99,12 @@ variable "db_seconds_until_auto_pause" {
   description = "The time in seconds before Aurora DB is paused"
   default     = 300
 }
+
 variable "task_memory" {
   description = "The amount (in MiB) of memory used by the task"
   default     = 2048
 }
+
 variable "task_cpu" {
   description = "The number of cpu units used by the task"
   default     = 1024
