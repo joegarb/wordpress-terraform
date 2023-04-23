@@ -3,8 +3,6 @@ provider "aws" {
 
 terraform {
   backend "s3" {
-    bucket = "mybucket"
-    key    = "wordpress"
   }
 }
 

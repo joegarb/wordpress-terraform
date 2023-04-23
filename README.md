@@ -4,35 +4,46 @@ Based on https://github.com/futurice/terraform-examples/tree/master/aws/wordpres
 
 ## Terraform setup
 
-## Initialize terraform environment
+### Initialize
 
 ```
-terraform init -backend-config="bucket=<BUCKET_NAME>"
+terraform init -backend-config=backend.hcl
 ```
 
 ### Create environment
 
+#### Option 1 - using .tfvars
+
+Ensure that a `terraform.tfvars` file has been created locally, similar to the following:
 ```
-  AWS_SDK_LOAD_CONFIG=1 \
-  TF_VAR_site_domain=<PUBLIC_DOMAIN> \
-  TF_VAR_public_alb_domain=<INTERNAL_DOMAIN_FOR_ALB> \
-  TF_VAR_db_master_username=<DB_MASTER_USERNAME> \
-  TF_VAR_db_master_password="<DB_MASTER_PASSWORD>" \
-  terraform apply
+site_domain        = "<PUBLIC_DOMAIN>"
+public_alb_domain  = "<INTERNAL_DOMAIN_FOR_ALB>"
+db_master_username = "<DB_MASTER_USERNAME>"
+db_master_password = "<DB_MASTER_PASSWORD>"
+```
+
+Then,
+```
+terraform apply
+```
+
+#### Option 2 - using environment variables
+
+```
+TF_VAR_site_domain=<PUBLIC_DOMAIN> \
+TF_VAR_public_alb_domain=<INTERNAL_DOMAIN_FOR_ALB> \
+TF_VAR_db_master_username=<DB_MASTER_USERNAME> \
+TF_VAR_db_master_password=<DB_MASTER_PASSWORD> \
+terraform apply
 ```
 
 ### Tear down
 
-```
-  AWS_SDK_LOAD_CONFIG=1 \
-  TF_VAR_site_domain=<PUBLIC_DOMAIN> \
-  TF_VAR_public_alb_domain=<INTERNAL_DOMAIN_FOR_ALB> \
-  TF_VAR_db_master_username=<DB_MASTER_USERNAME> \
-  TF_VAR_db_master_password="<DB_MASTER_PASSWORD>" \
-  terraform destroy
-```
+Ensure that vars are configured using .tfvars or provide them to `terraform destroy` as environment variables, as shown above.
 
-Instead of environment variables, you can use .tfvar files for assigning values to terraform variables.
+```
+terraform destroy
+```
 
 ## Tips
 
