@@ -149,3 +149,18 @@ variable "min_task" {
   description = "Minimum number of tasks should the service always maintain"
   default     = "1"
 }
+
+variable "image" {
+  description = "Docker image for ECS"
+  default     = "wordpress"
+}
+
+variable "wp_debug" {
+  description = "Whether to enable WordPress debugging"
+  default     = 0
+}
+
+variable "wp_extra" {
+  description = "Extra config to go into wp-config.php"
+  default     = ""
+}

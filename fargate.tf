@@ -179,10 +179,18 @@ resource "aws_ecs_task_definition" "this" {
       {
         "name": "WORDPRESS_DB_NAME",
         "value": "wordpress"
+      },
+      {
+        "name": "WORDPRESS_DEBUG",
+        "value": "${var.wp_debug}"
+      },
+      {
+        "name": "WORDPRESS_CONFIG_EXTRA",
+        "value": "define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); ${var.wp_extra}"
       }
     ],
     "essential": true,
-    "image": "wordpress",        
+    "image": "${var.image}",        
     "name": "wordpress",
     "portMappings": [
       {
@@ -229,7 +237,7 @@ resource "aws_lb_target_group" "this" {
   vpc_id      = module.vpc.vpc_id
   health_check {
     path    = "/"
-    matcher = "200,302"
+    matcher = "200,301,302"
   }
 
 }
