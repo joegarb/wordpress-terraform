@@ -22,6 +22,11 @@ resource "aws_rds_cluster" "this" {
     max_capacity             = var.db_max_capacity
     min_capacity             = var.db_min_capacity
   }
+  lifecycle {
+    ignore_changes = [
+      engine_version,
+    ]
+  }
   final_snapshot_identifier = "${var.prefix}-${var.environment}-${random_string.snapshot_suffix.result}"
   tags                      = var.tags
 }
