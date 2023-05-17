@@ -1,4 +1,4 @@
-# Wordpress on Fargate
+# WordPress on Fargate
 
 Based on https://github.com/futurice/terraform-examples/tree/master/aws/wordpress_fargate
 
@@ -47,7 +47,11 @@ terraform destroy
 
 ## Tips
 
-To connect to a running container:
+### View logs
+
+Enable debugging with the `wp_debug` variable, and then WordPress logs will be directed to Cloudwatch by default.
+
+### Connect to a running container
 
 ```
 ecs-session wordpress

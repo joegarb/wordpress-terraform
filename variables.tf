@@ -160,6 +160,16 @@ variable "wp_debug" {
   default     = 0
 }
 
+variable "wp_debug_log" {
+  description = "Whether to write WordPress debug logs. Requires wp_debug to also be set."
+  default     = true
+}
+
+variable "wp_debug_log_stdout" {
+  description = "Whether to direct WordPress debug logs to stdout for Cloudwatch rather than to a local file. Requires wp_debug_log to also be true."
+  default     = true
+}
+
 variable "wp_extra" {
   description = "Extra config to go into wp-config.php"
   default     = ""

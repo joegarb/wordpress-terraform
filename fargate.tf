@@ -163,11 +163,11 @@ resource "aws_ecs_task_definition" "this" {
   {
     "secrets": [
       {
-        "name": "WORDPRESS_DB_USER", 
+        "name": "WORDPRESS_DB_USER",
         "valueFROM": "${aws_ssm_parameter.db_master_user.arn}"
       },
       {
-        "name": "WORDPRESS_DB_PASSWORD", 
+        "name": "WORDPRESS_DB_PASSWORD",
         "valueFROM": "${aws_ssm_parameter.db_master_password.arn}"
       }
     ],
@@ -186,11 +186,11 @@ resource "aws_ecs_task_definition" "this" {
       },
       {
         "name": "WORDPRESS_CONFIG_EXTRA",
-        "value": "define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); ${var.wp_extra}"
+        "value": "define( 'WP_HOME', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); define( 'WP_SITEURL', 'https://' . $_SERVER['HTTP_HOST'] . '/' ); define( 'WP_DEBUG_LOG', ${var.wp_debug_log && var.wp_debug_log_stdout ? "'/dev/stdout'" : var.wp_debug_log} ); ${var.wp_extra}"
       }
     ],
     "essential": true,
-    "image": "${var.image}",        
+    "image": "${var.image}",
     "name": "wordpress",
     "portMappings": [
       {
