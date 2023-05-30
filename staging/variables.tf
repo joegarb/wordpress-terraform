@@ -18,3 +18,7 @@ variable "key_name" {
   description = "SSH key to attach to EC2 instance"
   default     = null
 }
+
+variable "site_domain" {
+  description = "The primary domain name of the website"
+}
