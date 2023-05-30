@@ -1,12 +1,12 @@
+variable "prefix" {
+  description = "Prefix for all the resources to be created. Please note this allows only lowercase alphanumeric characters and hyphen"
+  default     = "demo-tf"
+}
+
 variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
   type        = map
   default     = {}
-}
-
-variable "prefix" {
-  description = "Prefix for all the resources to be created. Please note thst 2 allows only lowercase alphanumeric characters and hyphen"
-  default     = "tf"
 }
 
 variable "site_domain" {
@@ -54,7 +54,7 @@ variable "private_subnet_cidrs" {
 
 variable "environment" {
   description = "Name of the application environment. e.g. dev, prod, test, staging"
-  default     = "dev"
+  default     = "prod"
 }
 
 variable "db_backup_retention_days" {

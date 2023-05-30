@@ -1,3 +1,3 @@
 bucket = "mybucket"
-key    = "wordpress"
+key    = "wordpress-production"
 region = "us-east-1"
