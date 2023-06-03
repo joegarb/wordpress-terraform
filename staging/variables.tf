@@ -22,3 +22,33 @@ variable "key_name" {
 variable "site_domain" {
   description = "The primary domain name of the website"
 }
+
+variable "image" {
+  description = "Docker image for WordPress"
+  default     = "wordpress"
+}
+
+variable "db_username" {
+  description = "Database username for WordPress"
+  default     = "exampleuser"
+}
+
+variable "db_password" {
+  description = "Database password for WordPress"
+  default     = "examplepass"
+}
+
+variable "wp_debug" {
+  description = "Whether to enable WordPress debugging"
+  default     = 0
+}
+
+variable "wp_debug_log" {
+  description = "Whether to write WordPress debug logs. Requires wp_debug to also be set."
+  default     = true
+}
+
+variable "wp_extra" {
+  description = "Extra config to go into wp-config.php"
+  default     = ""
+}

@@ -19,7 +19,15 @@ data "cloudinit_config" "this" {
       write_files = [
         {
           encoding    = "b64"
-          content     = filebase64("docker-compose.yml")
+          content     = base64encode(templatefile("docker-compose.yml", {
+            image        = var.image
+            site_domain  = var.site_domain
+            db_username  = var.db_username
+            db_password  = var.db_password
+            wp_debug     = var.wp_debug
+            wp_debug_log = var.wp_debug_log
+            wp_extra     = var.wp_extra
+          }))
           path        = "/home/ec2-user/docker-compose.yml"
           defer       = true
           owner       = "ec2-user:ec2-user"
