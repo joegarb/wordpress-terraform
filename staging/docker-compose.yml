@@ -6,15 +6,17 @@ services:
     container_name: wordpress
     image: ${image}
     restart: unless-stopped
-    ports:
-      - 80:80
     environment:
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_USER: ${db_username}
       WORDPRESS_DB_PASSWORD: ${db_password}
       WORDPRESS_DB_NAME: wordpress
       WORDPRESS_DEBUG: ${wp_debug}
-      WORDPRESS_CONFIG_EXTRA: define( 'WP_HOME', 'http://${site_domain}/' ); define( 'WP_SITEURL', 'http://${site_domain}/' ); define( 'WP_DEBUG_LOG', ${wp_debug_log} ); ${wp_extra}
+      # If SSL was not initially enabled, then enable by changing http to https in the urls in WORDPRESS_CONFIG_EXTRA and setting LETSENCRYPT_HOST and LETSENCRYPT_EMAIL
+      WORDPRESS_CONFIG_EXTRA: define( 'WP_HOME', '${url_scheme}://${site_domain}/' ); define( 'WP_SITEURL', '${url_scheme}://${site_domain}/' ); define( 'WP_DEBUG_LOG', ${wp_debug_log} ); ${wp_extra}
+      VIRTUAL_HOST: ${site_domain}
+      LETSENCRYPT_HOST: ${letsencrypt_host}
+      LETSENCRYPT_EMAIL: ${letsencrypt_email}
     volumes:
       - wordpress:/var/www/html
 
@@ -30,6 +32,34 @@ services:
     volumes:
       - db:/var/lib/mysql
 
+  nginx-proxy:
+    container_name: nginx-proxy
+    image: jwilder/nginx-proxy
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - certs:/etc/nginx/certs:ro
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+
+  nginx-proxy-companion:
+    container_name: nginx-proxy-companion
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - acme:/etc/acme.sh
+
 volumes:
   wordpress:
   db:
+  certs:
+  acme:

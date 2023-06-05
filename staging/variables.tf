@@ -1,3 +1,12 @@
+variable "site_domain" {
+  description = "The primary domain name of the website"
+}
+
+variable "letsencrypt_email" {
+  description = "Email address required to obtain a SSL cert from Lets Encrypt. If not specified, SSL will be disabled"
+  default     = null
+}
+
 variable "prefix" {
   description = "Prefix for all the resources to be created"
   default     = "demo-tf-staging"
@@ -17,10 +26,6 @@ variable "instance_type" {
 variable "key_name" {
   description = "SSH key to attach to EC2 instance"
   default     = null
-}
-
-variable "site_domain" {
-  description = "The primary domain name of the website"
 }
 
 variable "image" {

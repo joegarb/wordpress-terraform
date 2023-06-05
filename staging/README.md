@@ -12,10 +12,9 @@ terraform init -backend-config=backend.hcl
 
 ### Create environment
 
-Optionally create a `terraform.tfvars` file within the folder where you will run `terraform apply` to override any values from variables.tf, similar to the following:
+Create a `terraform.tfvars` file within the folder where you will run `terraform apply` to override any values from variables.tf, like:
 ```
-key_name      = "my_key"
-instance_type = "t3a.nano"
+site_domain = "example.com"
 ```
 
 Then,
@@ -30,6 +29,10 @@ terraform destroy
 ```
 
 ## Tips
+
+### SSL
+
+Enable SSL by setting the letsencrypt_email variable before applying. Or after applying, connect to the instance and edit `docker-compose.yml` according to the instructions in that file, and restart the wordpress docker container.
 
 ### Connect to the instance
 
