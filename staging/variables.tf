@@ -35,12 +35,12 @@ variable "image" {
 
 variable "db_username" {
   description = "Database username for WordPress"
-  default     = "exampleuser"
+  default     = "wordpress"
 }
 
 variable "db_password" {
   description = "Database password for WordPress"
-  default     = "examplepass"
+  default     = null
 }
 
 variable "wp_debug" {

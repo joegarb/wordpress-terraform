@@ -17,6 +17,8 @@ Create a `terraform.tfvars` file within the folder where you will run `terraform
 site_domain = "example.com"
 ```
 
+`site_domain` is the only required variable, but you will likely want to also set `letsencrypt_email` to enable SSL. Review variables.tf for all the variables that can be specified.
+
 Then,
 ```
 terraform apply

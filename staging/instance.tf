@@ -26,7 +26,7 @@ data "cloudinit_config" "this" {
             letsencrypt_host  = var.letsencrypt_email != null ? var.site_domain : ""
             letsencrypt_email = var.letsencrypt_email != null ? var.letsencrypt_email : ""
             db_username       = var.db_username
-            db_password       = var.db_password
+            db_password       = var.db_password != null ? var.db_password : random_password.db_password.result
             wp_debug          = var.wp_debug
             wp_debug_log      = var.wp_debug_log
             wp_extra          = var.wp_extra
@@ -112,8 +112,14 @@ resource "aws_security_group" "this" {
   ]
 }
 
+resource "random_password" "db_password" {
+  length = 20
+  special = true
+  override_special = "!#%&*()-_=+[]{}<>?"
+}
+
 resource "random_password" "sftp_password" {
   length = 20
   special = true
-  override_special = "!#$%&*()-_=+[]{}<>?"
+  override_special = "!#%&*()-_=+[]{}<>?"
 }
