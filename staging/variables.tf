@@ -45,7 +45,7 @@ variable "db_password" {
 
 variable "wp_debug" {
   description = "Whether to enable WordPress debugging"
-  default     = 0
+  default     = 1
 }
 
 variable "wp_debug_log" {
