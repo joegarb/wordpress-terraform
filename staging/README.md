@@ -1,6 +1,6 @@
 # WordPress All-in-One EC2
 
-WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment.
+WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment. SSL and FTP are also included.
 
 ## Terraform setup
 
@@ -43,3 +43,5 @@ Or if you specified a key_name, connect with ssh like:
 ```
 ssh -i {private_key} ec2-user@{ip_address}
 ```
+
+FTP access to WordPress files is also available on port 2222. Credentials can be located within docker-compose.yml on the EC2 instance.

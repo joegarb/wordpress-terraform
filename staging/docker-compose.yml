@@ -18,7 +18,7 @@ services:
       LETSENCRYPT_HOST: ${letsencrypt_host}
       LETSENCRYPT_EMAIL: ${letsencrypt_email}
     volumes:
-      - wordpress:/var/www/html
+      - /home/ec2-user/wordpress:/var/www/html
 
   db:
     container_name: db
@@ -58,8 +58,18 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - acme:/etc/acme.sh
 
+  sftp:
+    container_name: sftp
+    image: atmoz/sftp
+    volumes:
+      - sftp-ssh:/etc/ssh
+      - /home/ec2-user/wordpress:/home/${sftp_username}/wordpress
+    ports:
+      - 2222:22
+    command: ${sftp_username}:${sftp_password}:33
+
 volumes:
-  wordpress:
   db:
   certs:
   acme:
+  sftp-ssh:

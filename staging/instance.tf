@@ -30,6 +30,8 @@ data "cloudinit_config" "this" {
             wp_debug          = var.wp_debug
             wp_debug_log      = var.wp_debug_log
             wp_extra          = var.wp_extra
+            sftp_username     = var.sftp_username
+            sftp_password     = var.sftp_password != null ? var.sftp_password : random_password.sftp_password.result
           }))
           path        = "/home/ec2-user/docker-compose.yml"
           defer       = true
@@ -65,6 +67,11 @@ locals {
   {
       port        = 22
       description = "Port 22 SSH"
+      protocol    = "tcp"
+  },
+  {
+      port        = 2222
+      description = "Port 2222 SFTP"
       protocol    = "tcp"
   }
   ]
@@ -103,4 +110,10 @@ resource "aws_security_group" "this" {
       self             = false 
     }
   ]
+}
+
+resource "random_password" "sftp_password" {
+  length = 20
+  special = true
+  override_special = "!#$%&*()-_=+[]{}<>?"
 }

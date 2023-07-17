@@ -57,3 +57,13 @@ variable "wp_extra" {
   description = "Extra config to go into wp-config.php"
   default     = ""
 }
+
+variable "sftp_username" {
+  description = "SFTP username"
+  default     = "ftpuser"
+}
+
+variable "sftp_password" {
+  description = "SFTP password"
+  default     = null
+}
