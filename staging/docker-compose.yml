@@ -63,6 +63,10 @@ services:
   sftp:
     container_name: sftp
     image: atmoz/sftp
+    # Enable sftp by running `docker compose --profile sftp up -d`
+    profiles:
+      - sftp
+    restart: unless-stopped
     volumes:
       - sftp-ssh:/etc/ssh
       - /home/ec2-user/wordpress:/home/${sftp_username}/wordpress
