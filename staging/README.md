@@ -43,7 +43,11 @@ Use EC2 Instance Connect.
 Or if you specified a key_name, connect with ssh like:
 
 ```
-ssh -i {private_key} ec2-user@{ip_address}
+ssh -i {private_key} ec2-user@{site_domain}
 ```
 
-FTP access to WordPress files is also available on port 2222. Credentials can be located within docker-compose.yml on the EC2 instance.
+FTP access to WordPress files is also available on port 2222. Credentials can be located within docker-compose.yml on the EC2 instance or customized with a terraform variable.
+
+```
+sftp -P 2222 ftpuser@{site_domain}
+```
