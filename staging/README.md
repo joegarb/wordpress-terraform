@@ -30,15 +30,15 @@ terraform apply
 terraform destroy
 ```
 
-## Tips
+## More information
 
 ### SSL
 
 Enable SSL by setting the letsencrypt_email variable before applying. Or after applying, connect to the instance and edit `docker-compose.yml` according to the instructions in that file, and restart the wordpress docker container.
 
-### Connect to the instance
+### SSH
 
-Use EC2 Instance Connect.
+One option for shell access is to use EC2 Instance Connect.
 
 Or if you specified a key_name, connect with ssh like:
 
@@ -46,8 +46,24 @@ Or if you specified a key_name, connect with ssh like:
 ssh -i {private_key} ec2-user@{site_domain}
 ```
 
-FTP access to WordPress files is also available on port 2222. Credentials can be located within docker-compose.yml on the EC2 instance or customized with a terraform variable.
+### FTP
+
+FTP access to the WordPress files is available on port 2222. Credentials can be located within docker-compose.yml on the EC2 instance or customized with a terraform variable.
 
 ```
 sftp -P 2222 ftpuser@{site_domain}
+```
+
+### SQL
+
+Remote SQL access is available using SSH tunneling.
+
+Create tunnel:
+```
+ssh -N -L 3308:127.0.0.1:3306 -i {private_key} ec2-user@{site_domain}
+```
+
+Connect to database:
+```
+mysql -h 127.0.0.1 -P 3308 -u wordpress -p
 ```
