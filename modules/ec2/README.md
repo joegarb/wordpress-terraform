@@ -2,35 +2,7 @@
 
 WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment only. SSL and SFTP are also included.
 
-## Terraform setup
-
-### Initialize
-
-```
-terraform init -backend-config=backend.hcl
-```
-
-### Create environment
-
-Create a `terraform.tfvars` file within the folder where you will run `terraform apply` to override any values from variables.tf, like:
-```
-site_domain = "example.com"
-```
-
-`site_domain` is the only required variable, but you will likely want to also set `letsencrypt_email` to enable SSL. Review variables.tf for all the variables that can be specified.
-
-Then,
-```
-terraform apply
-```
-
-### Tear down
-
-```
-terraform destroy
-```
-
-## More information
+## Features
 
 ### SSL
 

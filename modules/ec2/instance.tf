@@ -10,7 +10,7 @@ resource "aws_instance" "this" {
 data "cloudinit_config" "this" {
   part {
     content_type = "text/x-shellscript"
-    content      = file("user-data.sh")
+    content      = file("${path.module}/user-data.sh")
   }
 
   part {
@@ -19,7 +19,7 @@ data "cloudinit_config" "this" {
       write_files = [
         {
           encoding    = "b64"
-          content     = base64encode(templatefile("docker-compose.yml", {
+          content     = base64encode(templatefile("${path.module}/docker-compose.yml", {
             image             = var.image
             site_domain       = var.site_domain
             url_scheme        = var.letsencrypt_email != null ? "https" : "http"
