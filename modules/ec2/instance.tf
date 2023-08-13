@@ -1,5 +1,5 @@
 resource "aws_instance" "this" {
-  tags                   = "${merge({"Name" = "${var.prefix}-wordpress"}, var.tags)}"
+  tags                   = "${merge({"Name" = "${var.environment}"}, var.tags)}"
   ami                    = data.aws_ami.this.id
   instance_type          = var.instance_type
   key_name               = var.key_name
@@ -78,7 +78,7 @@ locals {
 }
 
 resource "aws_security_group" "this" {
-  name        = "${var.prefix}-wordpress"
+  name        = "${var.environment}"
   tags        = var.tags
   description = "Allow HTTP/HTTPS/SSH inbound traffic"
 

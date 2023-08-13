@@ -1,15 +1,10 @@
+variable "environment" {
+  description = "Environment name which will be prefixed on all the resources to be created"
+  default     = "demo-tf-staging"
+}
+
 variable "site_domain" {
   description = "The primary domain name of the website"
-}
-
-variable "letsencrypt_email" {
-  description = "Email address required to obtain a SSL cert from Lets Encrypt. If not specified, SSL will be disabled"
-  default     = null
-}
-
-variable "prefix" {
-  description = "Prefix for all the resources to be created"
-  default     = "demo-tf-staging"
 }
 
 variable "tags" {
@@ -20,11 +15,16 @@ variable "tags" {
 
 variable "instance_type" {
   description = "EC2 instance type"
-  default     = "t2.micro"
+  default     = "t2.small"
 }
 
 variable "key_name" {
   description = "SSH key to attach to EC2 instance"
+  default     = null
+}
+
+variable "letsencrypt_email" {
+  description = "Email address required to obtain a SSL cert from Lets Encrypt. If not specified, SSL will be disabled"
   default     = null
 }
 

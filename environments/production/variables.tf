@@ -6,6 +6,14 @@ variable "public_alb_domain" {
   description = "The public domian name of the ALB"
 }
 
+variable "tags" {
+  description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
+  type        = map
+  default     = {
+    stage = "production"
+  }
+}
+
 variable "db_master_username" {
   description = "Master username of the db"
 }

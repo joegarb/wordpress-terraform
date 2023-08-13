@@ -3,7 +3,7 @@ module "environment" {
 
     site_domain       = var.site_domain
     letsencrypt_email = var.letsencrypt_email
-    prefix            = var.prefix
+    environment       = var.environment
     tags              = var.tags
     instance_type     = var.instance_type
     key_name          = var.key_name
