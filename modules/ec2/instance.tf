@@ -115,11 +115,11 @@ resource "aws_security_group" "this" {
 resource "random_password" "db_password" {
   length = 20
   special = true
-  override_special = "!#%&*()-_=+[]{}<>?"
+  override_special = "!#%&*-_=+?"
 }
 
 resource "random_password" "sftp_password" {
   length = 20
   special = true
-  override_special = "!#%&*()-_=+[]{}<>?"
+  override_special = "!#%&*-_=+?"
 }
