@@ -67,14 +67,14 @@ variable "db_backup_window" {
   default     = "07:00-09:00"
 }
 
-variable "db_max_capacity" {
-  description = "The maximum Aurora capacity unit of the db. Ref - https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html"
-  default     = "1"
-}
-
 variable "db_min_capacity" {
   description = "The minimum Aurora capacity unit of the db. Ref - https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html"
   default     = "1"
+}
+
+variable "db_max_capacity" {
+  description = "The maximum Aurora capacity unit of the db. Ref - https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/aurora-serverless.how-it-works.html"
+  default     = "2"
 }
 
 variable "db_master_username" {
@@ -87,17 +87,7 @@ variable "db_master_password" {
 
 variable "db_engine_version" {
   description = "The database engine version"
-  default     = "5.6.10a"
-}
-
-variable "db_auto_pause" {
-  description = "Whether to enable auto pause"
-  default     = true
-}
-
-variable "db_seconds_until_auto_pause" {
-  description = "The time in seconds before Aurora DB is paused"
-  default     = 300
+  default     = "8.0.mysql_aurora.3.04.0"
 }
 
 variable "task_memory" {
@@ -140,14 +130,14 @@ variable "task_cpu_high_threshold" {
   default     = "75"
 }
 
-variable "max_task" {
-  description = "Maximum number of tasks should the service scale to"
-  default     = "2"
-}
-
 variable "min_task" {
   description = "Minimum number of tasks should the service always maintain"
   default     = "1"
+}
+
+variable "max_task" {
+  description = "Maximum number of tasks should the service scale to"
+  default     = "2"
 }
 
 variable "image" {
