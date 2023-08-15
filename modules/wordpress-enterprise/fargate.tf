@@ -1,6 +1,6 @@
 # Ref - https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html
 resource "aws_iam_role" "task_execution_role" {
-  name = "${var.prefix}-task-execution-role-${var.environment}"
+  name = "${var.environment}-task-execution-role"
   tags = var.tags
 
   assume_role_policy = <<EOF
@@ -51,7 +51,7 @@ resource "aws_iam_role_policy_attachment" "task_execution_policy_attach" {
 }
 
 resource "aws_iam_role" "task_role" {
-  name = "${var.prefix}-task-role-${var.environment}"
+  name = "${var.environment}-task-role"
   tags = var.tags
 
   assume_role_policy = <<EOF
@@ -100,11 +100,11 @@ resource "aws_iam_role_policy_attachment" "task_policy_attach" {
 }
 
 resource "aws_ecs_cluster" "this" {
-  name = "${var.prefix}-${var.environment}"
+  name = "${var.environment}"
 }
 
 resource "aws_security_group" "wordpress" {
-  name        = "${var.prefix}-wordpress-${var.environment}"
+  name        = "${var.environment}-wordpress"
   description = "Fargate wordpress"
   vpc_id      = module.vpc.vpc_id
 
@@ -126,7 +126,7 @@ resource "aws_security_group" "wordpress" {
 }
 
 resource "aws_ecs_service" "this" {
-  name                   = "${var.prefix}-${var.environment}"
+  name                   = "${var.environment}"
   cluster                = aws_ecs_cluster.this.id
   task_definition        = aws_ecs_task_definition.this.arn
   desired_count          = var.desired_count
@@ -151,7 +151,7 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_ecs_task_definition" "this" {
-  family                   = "${var.prefix}-${var.environment}"
+  family                   = "${var.environment}"
   execution_role_arn       = aws_iam_role.task_execution_role.arn
   task_role_arn            = aws_iam_role.task_role.arn
   network_mode             = "awsvpc"
@@ -164,11 +164,11 @@ resource "aws_ecs_task_definition" "this" {
     "secrets": [
       {
         "name": "WORDPRESS_DB_USER",
-        "valueFROM": "${aws_ssm_parameter.db_master_user.arn}"
+        "valueFROM": "${aws_ssm_parameter.db_user.arn}"
       },
       {
         "name": "WORDPRESS_DB_PASSWORD",
-        "valueFROM": "${aws_ssm_parameter.db_master_password.arn}"
+        "valueFROM": "${aws_ssm_parameter.db_password.arn}"
       }
     ],
     "environment": [
@@ -207,7 +207,7 @@ resource "aws_ecs_task_definition" "this" {
       "logDriver":"awslogs",
       "options": {
         "awslogs-group": "${aws_cloudwatch_log_group.wordpress.name}",
-        "awslogs-region": "${data.aws_region.current.name}",
+        "awslogs-region": "${data.aws_region.this.name}",
         "awslogs-stream-prefix": "app"
       }
     }
@@ -224,13 +224,13 @@ CONTAINER_DEFINITION
 }
 
 resource "aws_cloudwatch_log_group" "wordpress" {
-  name              = "/${var.prefix}/${var.environment}/fg-task"
+  name              = "/${var.environment}/fg-task"
   tags              = var.tags
   retention_in_days = var.log_retention_in_days
 }
 
 resource "aws_lb_target_group" "this" {
-  name        = "${var.prefix}-${var.environment}"
+  name        = "${var.environment}"
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
@@ -259,7 +259,7 @@ resource "aws_lb_listener_rule" "wordpress" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization_high" {
-  alarm_name          = "${var.prefix}-high-CPU-utilization-ecs-${var.environment}"
+  alarm_name          = "${var.environment}-high-CPU-utilization-ecs"
   comparison_operator = "GreaterThanOrEqualToThreshold"
   evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
@@ -277,7 +277,7 @@ resource "aws_cloudwatch_metric_alarm" "cpu_utilization_high" {
 }
 
 resource "aws_cloudwatch_metric_alarm" "cpu_utilization_low" {
-  alarm_name          = "${var.prefix}-low-CPU-utilization-ecs-${var.environment}"
+  alarm_name          = "${var.environment}-low-CPU-utilization-ecs"
   comparison_operator = "LessThanThreshold"
   evaluation_periods  = "1"
   metric_name         = "CPUUtilization"
@@ -303,7 +303,7 @@ resource "aws_appautoscaling_target" "this" {
 }
 
 resource "aws_appautoscaling_policy" "scale_up" {
-  name               = "${var.prefix}-ecs-scale-up-${var.environment}"
+  name               = "${var.environment}-ecs-scale-up"
   policy_type        = "StepScaling"
   resource_id        = aws_appautoscaling_target.this.resource_id
   scalable_dimension = aws_appautoscaling_target.this.scalable_dimension
@@ -322,7 +322,7 @@ resource "aws_appautoscaling_policy" "scale_up" {
 }
 
 resource "aws_appautoscaling_policy" "scale_down" {
-  name               = "${var.prefix}-ecs-scale-down-${var.environment}"
+  name               = "${var.environment}-ecs-scale-down"
   policy_type        = "StepScaling"
   resource_id        = aws_appautoscaling_target.this.resource_id
   scalable_dimension = aws_appautoscaling_target.this.scalable_dimension

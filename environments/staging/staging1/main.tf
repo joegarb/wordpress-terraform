@@ -1,5 +1,5 @@
 module "environment" {
-    source = "../../../modules/ec2"
+    source = "../../../modules/wordpress-all-in-one"
 
     site_domain       = var.site_domain
     letsencrypt_email = var.letsencrypt_email

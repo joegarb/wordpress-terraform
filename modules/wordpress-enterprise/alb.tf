@@ -7,7 +7,7 @@ module "acm_alb" {
 }
 
 resource "aws_security_group" "alb" {
-  name        = "${var.prefix}-alb-${var.environment}"
+  name        = "${var.environment}-alb"
   description = "Allow HTTPS inbound traffc"
   vpc_id      = module.vpc.vpc_id
 
@@ -38,7 +38,7 @@ resource "aws_security_group" "alb" {
 module "alb" {
   source             = "terraform-aws-modules/alb/aws"
   version            = "~> 5.0"
-  name               = "${var.prefix}-${var.environment}"
+  name               = "${var.environment}"
   load_balancer_type = "application"
   vpc_id             = module.vpc.vpc_id
   subnets            = module.vpc.public_subnets
@@ -53,7 +53,7 @@ module "alb" {
 
   target_groups = [
     {
-      name             = "${var.prefix}-default-${var.environment}"
+      name             = "${var.environment}-default"
       backend_protocol = "HTTP"
       backend_port     = 80
     }

@@ -1,6 +1,5 @@
 variable "environment" {
   description = "Environment name which will be prefixed on all the resources to be created"
-  default     = "demo-tf-staging"
 }
 
 variable "site_domain" {

@@ -1,5 +1,5 @@
 resource "aws_efs_file_system" "this" {
-  creation_token = "${var.prefix}-${var.environment}"
+  creation_token = "${var.environment}"
   tags           = var.tags
 }
 
@@ -13,7 +13,7 @@ resource "aws_efs_mount_target" "this" {
 }
 
 resource "aws_security_group" "efs" {
-  name        = "${var.prefix}-efs-${var.environment}"
+  name        = "${var.environment}-efs"
   description = "Allow traffic ffrom self"
   vpc_id      = module.vpc.vpc_id
 
