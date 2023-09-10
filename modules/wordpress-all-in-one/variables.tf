@@ -57,6 +57,26 @@ variable "wp_extra" {
   default     = ""
 }
 
+variable "scheduled_stop_enabled" {
+  description = "Whether to enable scheduled stop and start rules"
+  default     = true
+}
+
+variable "scheduled_stop_timezone" {
+  description = "Timezone for scheduled stop and start rules"
+  default     = "US/Eastern"
+}
+
+variable "scheduled_start" {
+  description = "Scheduler expression for starting the instance (use along with cron_stop)"
+  default     = "cron(0 7 ? * MON-FRI *)"
+}
+
+variable "scheduled_stop" {
+  description = "Scheduler expression for stopping the instance (such as during the night when it is not in use, or once weekly, etc)"
+  default     = "cron(0 3 ? * TUE-SAT *)"
+}
+
 variable "sftp_username" {
   description = "SFTP username"
   default     = "ftpuser"
