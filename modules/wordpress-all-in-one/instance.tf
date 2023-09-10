@@ -18,6 +18,15 @@ data "cloudinit_config" "this" {
     content      = yamlencode({
       write_files = [
         {
+          content  = <<-EOF
+            client_max_body_size 0;
+          EOF
+          path        = "/home/ec2-user/nginx-proxy.conf"
+          defer       = true
+          owner       = "ec2-user:ec2-user"
+          permissions = "0644"
+        },
+        {
           encoding    = "b64"
           content     = base64encode(templatefile("${path.module}/docker-compose.yml", {
             image             = var.image
