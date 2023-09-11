@@ -4,6 +4,7 @@ resource "aws_instance" "this" {
   instance_type          = var.instance_type
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.this.id]
+  iam_instance_profile   = aws_iam_instance_profile.this.name
   user_data              = data.cloudinit_config.this.rendered
 }
 
@@ -131,4 +132,56 @@ resource "random_password" "sftp_password" {
   length = 20
   special = true
   override_special = "!#%&*-_=+?"
+}
+
+# The following IAM resources are for giving the EC2 instance access to pull docker images from ECR
+resource "aws_iam_policy" "ec2_ecr_policy" {
+  name        = "${var.environment}-ec2-ecr-policy"
+  description = "Provides access to ECR from EC2 instances"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:DescribeImages",
+          "ecr:GetAuthorizationToken",
+          "ecr:ListImages"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role" "this" {
+  name = "${var.environment}"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Sid    = ""
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "this" {
+  name       = "${var.environment}"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = aws_iam_policy.ec2_ecr_policy.arn
+}
+
+resource "aws_iam_instance_profile" "this" {
+  name = "${var.environment}"
+  role = aws_iam_role.this.name
 }

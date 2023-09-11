@@ -1,6 +1,6 @@
 # WordPress All-in-One EC2
 
-WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment only. SSL and SFTP are also included.
+WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment only. SSL and SFTP are included, as well as support for using private docker images from ECR.
 
 ## Features
 

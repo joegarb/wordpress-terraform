@@ -10,5 +10,14 @@ sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
 sudo service docker start
 sudo chkconfig docker on
 
+# Support using private docker images from ECR (along with IAM resources attached to the instance)
+sudo dnf install -y amazon-ecr-credential-helper
+mkdir /home/ec2-user/.docker
+cat << EOF > /home/ec2-user/.docker/config.json
+{
+	"credsStore": "ecr-login"
+}
+EOF
+
 cd /home/ec2-user
-docker compose up -d
+docker --config /home/ec2-user/.docker compose up -d
