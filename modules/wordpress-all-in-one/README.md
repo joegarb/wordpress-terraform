@@ -1,6 +1,6 @@
 # WordPress All-in-One EC2
 
-WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment only. SSL and SFTP are included, as well as support for using private docker images from ECR.
+WordPress and MySQL on a single EC2 using docker compose, suitable for a dev or staging environment only. SSL and SFTP are included, as well as support for using private docker images from ECR. Also, scheduled downtime for cost savings when not in use.
 
 ## Features
 
@@ -42,3 +42,7 @@ sftp -P 2222 ftpuser@{site_domain}
 ```
 
 Credentials are located within docker-compose.yml on the instance or can be specified with variables.
+
+### Scheduled downtime
+
+To save money, the EC2 instance can be scheduled to shut down during specified time periods (such as overnight, weekends, etc). This is configurable via the variables scheduled_start, scheduled_stop, and others.

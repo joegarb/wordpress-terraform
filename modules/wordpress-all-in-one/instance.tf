@@ -1,5 +1,12 @@
 resource "aws_instance" "this" {
-  tags                   = "${merge({"Name" = "${var.environment}"}, var.tags)}"
+  tags                   = "${merge(
+    {
+      "Name"          = "${var.environment}",
+      "AUTO_DNS_NAME" = "${var.site_domain}",
+      "AUTO_DNS_ZONE" = "${aws_route53_record.this.zone_id}"
+    }, 
+    var.tags
+  )}"
   ami                    = data.aws_ami.this.id
   instance_type          = var.instance_type
   key_name               = var.key_name
@@ -19,7 +26,15 @@ data "cloudinit_config" "this" {
     content      = yamlencode({
       write_files = [
         {
-          content  = <<-EOF
+          encoding    = "b64"
+          content     = base64encode(file("${path.module}/update-ip.sh"))
+          path        = "/var/lib/cloud/scripts/per-boot/update-ip.sh"
+          defer       = true
+          owner       = "ec2-user:ec2-user"
+          permissions = "0755"
+        },
+        {
+          content     = <<-EOF
             client_max_body_size 0;
           EOF
           path        = "/home/ec2-user/nginx-proxy.conf"
@@ -134,9 +149,33 @@ resource "random_password" "sftp_password" {
   override_special = "!#%&*-_=+?"
 }
 
-# The following IAM resources are for giving the EC2 instance access to pull docker images from ECR
+resource "aws_iam_policy" "ec2_update_ip" {
+  name        = "${var.environment}-ec2-update-ip"
+  description = "Allows EC2 instances to update their own IP in Route 53"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "ec2:DescribeTags"
+        ]
+        Effect   = "Allow"
+        Resource = "*"
+      },
+      {
+        Action = [
+          "route53:ChangeResourceRecordSets"
+        ]
+        Effect   = "Allow"
+        Resource = "arn:aws:route53:::hostedzone/${aws_route53_record.this.zone_id}"
+      }
+    ]
+  })
+}
+
 resource "aws_iam_policy" "ec2_ecr_policy" {
-  name        = "${var.environment}-ec2-ecr-policy"
+  name        = "${var.environment}-ec2-ecr"
   description = "Provides access to ECR from EC2 instances"
 
   policy = jsonencode({
@@ -175,7 +214,13 @@ resource "aws_iam_role" "this" {
   })
 }
 
-resource "aws_iam_policy_attachment" "this" {
+resource "aws_iam_policy_attachment" "policy_attachment_ec2_update_ip" {
+  name       = "${var.environment}"
+  roles      = [aws_iam_role.this.name]
+  policy_arn = aws_iam_policy.ec2_update_ip.arn
+}
+
+resource "aws_iam_policy_attachment" "policy_attachment_ec2_ecr" {
   name       = "${var.environment}"
   roles      = [aws_iam_role.this.name]
   policy_arn = aws_iam_policy.ec2_ecr_policy.arn

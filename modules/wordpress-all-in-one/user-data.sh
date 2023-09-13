@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Set initial IP in Route 53
+sh /var/lib/cloud/scripts/per-boot/update-ip.sh
+
 # Install docker and docker-compose
 sudo yum update -y
 sudo yum install docker -y
