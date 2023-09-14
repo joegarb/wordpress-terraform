@@ -59,7 +59,7 @@ variable "wp_extra" {
 
 variable "scheduled_stop_enabled" {
   description = "Whether to enable scheduled stop and start rules"
-  default     = true
+  default     = false
 }
 
 variable "scheduled_stop_timezone" {
