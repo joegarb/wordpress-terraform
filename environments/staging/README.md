@@ -30,4 +30,4 @@ terraform destroy
 
 ## More information
 
-See `/modules/ec2/README.md` for more details.
+See `/modules/wordpress-all-in-one/README.md` for more details.

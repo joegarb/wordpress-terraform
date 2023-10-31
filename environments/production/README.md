@@ -27,4 +27,4 @@ terraform destroy
 
 ## More information
 
-See `/modules/fargate/README.md` for more details.
+See `/modules/wordpress-enterprise/README.md` for more details.
