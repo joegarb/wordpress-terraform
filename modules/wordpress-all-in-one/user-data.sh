@@ -21,6 +21,7 @@ cat << EOF > /home/ec2-user/.docker/config.json
 	"credsStore": "ecr-login"
 }
 EOF
+sudo chown -R ec2-user:ec2-user /home/ec2-user/.docker
 
 cd /home/ec2-user
 docker --config /home/ec2-user/.docker compose up -d
