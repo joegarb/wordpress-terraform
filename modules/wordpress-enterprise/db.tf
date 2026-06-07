@@ -4,7 +4,7 @@ resource "random_string" "snapshot_suffix" {
 }
 
 resource "aws_rds_cluster" "this" {
-  cluster_identifier      = "${var.environment}"
+  cluster_identifier      = var.environment
   engine                  = "aurora-mysql"
   engine_mode             = "provisioned"
   vpc_security_group_ids  = [aws_security_group.db.id]
@@ -31,13 +31,13 @@ resource "aws_rds_cluster" "this" {
 
 resource "aws_rds_cluster_instance" "this" {
   cluster_identifier = aws_rds_cluster.this.id
-  instance_class = "db.serverless"
-  engine = aws_rds_cluster.this.engine
-  engine_version = aws_rds_cluster.this.engine_version
+  instance_class     = "db.serverless"
+  engine             = aws_rds_cluster.this.engine
+  engine_version     = aws_rds_cluster.this.engine_version
 }
 
 resource "aws_db_subnet_group" "this" {
-  name       = "${var.environment}"
+  name       = var.environment
   subnet_ids = module.vpc.private_subnets
   tags       = var.tags
 }
@@ -66,8 +66,8 @@ resource "aws_security_group" "db" {
 }
 
 resource "random_password" "db_password" {
-  length = 20
-  special = true
+  length           = 20
+  special          = true
   override_special = "!#%&*-_=+?"
 }
 

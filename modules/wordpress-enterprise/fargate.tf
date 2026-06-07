@@ -100,7 +100,7 @@ resource "aws_iam_role_policy_attachment" "task_policy_attach" {
 }
 
 resource "aws_ecs_cluster" "this" {
-  name = "${var.environment}"
+  name = var.environment
 }
 
 resource "aws_security_group" "wordpress" {
@@ -126,7 +126,7 @@ resource "aws_security_group" "wordpress" {
 }
 
 resource "aws_ecs_service" "this" {
-  name                   = "${var.environment}"
+  name                   = var.environment
   cluster                = aws_ecs_cluster.this.id
   task_definition        = aws_ecs_task_definition.this.arn
   desired_count          = var.desired_count
@@ -151,7 +151,7 @@ resource "aws_ecs_service" "this" {
 }
 
 resource "aws_ecs_task_definition" "this" {
-  family                   = "${var.environment}"
+  family                   = var.environment
   execution_role_arn       = aws_iam_role.task_execution_role.arn
   task_role_arn            = aws_iam_role.task_role.arn
   network_mode             = "awsvpc"
@@ -230,7 +230,7 @@ resource "aws_cloudwatch_log_group" "wordpress" {
 }
 
 resource "aws_lb_target_group" "this" {
-  name        = "${var.environment}"
+  name        = var.environment
   port        = 80
   protocol    = "HTTP"
   target_type = "ip"
