@@ -27,3 +27,37 @@ jobs:
             terraform -chdir="$dir" init -backend=false -input=false -no-color
             terraform -chdir="$dir" validate -no-color
           done
+
+  # Report-only for now (see the backlog of variable typing / version pins /
+  # deprecated syntax). Surfaces findings without gating the build.
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: terraform-linters/setup-tflint@v4
+      - run: tflint --init
+      - name: tflint (report-only)
+        continue-on-error: true
+        run: tflint --recursive --format compact
+
+  # Report-only: uploads findings to the Security tab (code scanning) without
+  # failing the build, so the security backlog is visible and trackable.
+  security:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install Trivy
+        run: curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin v0.74.0
+
+      - name: Scan (SARIF)
+        run: trivy config . --format sarif --output trivy.sarif --exit-code 0 -q
+
+      - name: Upload to Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy.sarif
