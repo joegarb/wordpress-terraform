@@ -1,16 +1,12 @@
-# WordPress on AWS — Infrastructure as Code
+# WordPress on AWS
 
-[![CI](https://github.com/joegarb/wordpress-terraform/actions/workflows/ci.yml/badge.svg)](https://github.com/joegarb/wordpress-terraform/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/github/license/joegarb/wordpress-terraform)](LICENSE)
+Modular Terraform for running a WordPress site on AWS, with separate production and staging environments on different infrastructure tiers.
 
-Modular Terraform for running a WordPress site on AWS, with separate **production** and **staging** environments that deliberately use different infrastructure tiers.
+> **Status:** reference architecture from 2023, pinned to older Terraform provider/module versions. Kept as a reference, not actively maintained or deployed. CI still validates and security-scans it (report-only; the finding backlog is under the repo's Security → Code scanning tab). Provider/module upgrades and security hardening are still to do.
 
-> ⚠️ **Status — reference architecture (2023), pending modernization.**
-> Built and last run in 2023, and pinned to older Terraform provider/module versions. It's kept as a reference, not actively maintained or deployed. CI validates and security-scans it (report-only — the current finding backlog is visible under the repo's **Security → Code scanning** tab). A modernization pass (provider/module upgrades + security hardening) is still to do.
+## Environments
 
-## Two tiers, on purpose
-
-Production and staging run on **intentionally different** setups — a cost-saving tradeoff, with the known downside that staging isn't a faithful copy of production.
+Production and staging use different infrastructure tiers to save cost. The tradeoff is that staging isn't a faithful copy of production.
 
 - **Production — [`wordpress-enterprise`](modules/wordpress-enterprise)**: a highly-available, containerized stack (diagram below).
 - **Staging — [`wordpress-all-in-one`](modules/wordpress-all-in-one)**: a single EC2 instance running WordPress via docker-compose, with scheduled stop/start to save money while idle.
@@ -42,10 +38,10 @@ flowchart TB
 
 Each environment and module has its own README with setup steps and variables.
 
-## Working with it
+## Usage
 
-- **Prerequisites:** Terraform, and — to deploy — an AWS account.
-- **Validate for free:** static checks need no AWS credentials and cost nothing —
+- **Prerequisites:** Terraform, plus an AWS account to deploy.
+- **Validate:** static checks run without AWS credentials:
 
   ```bash
   terraform -chdir=environments/production init -backend=false
@@ -53,4 +49,4 @@ Each environment and module has its own README with setup steps and variables.
   ```
 
   This is what CI runs, alongside `tflint` and a [Trivy](https://trivy.dev) security scan.
-- **Deploy:** see the per-environment READMEs. `terraform apply` provisions real, billable AWS resources (Fargate, Aurora, ALB, CloudFront, NAT gateways) — not free.
+- **Deploy:** see the per-environment READMEs. `terraform apply` provisions billable AWS resources (Fargate, Aurora, ALB, CloudFront, NAT gateways).
