@@ -6,6 +6,12 @@ variable "site_domain" {
   description = "The primary domain name of the website"
 }
 
+variable "hosted_zone_name" {
+  description = "Name of the existing Route 53 hosted zone that serves DNS for site_domain. Defaults to the apex/registered domain derived from site_domain (e.g. \"cloud.example.com\" => \"example.com\"). Set this to site_domain itself when you delegate the subdomain to its own hosted zone."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
   type        = map(any)
