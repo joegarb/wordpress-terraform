@@ -72,8 +72,6 @@ resource "aws_iam_role" "scheduler_ec2_role" {
   name = "${var.environment}-scheduler-ec2-role"
   tags = var.tags
 
-  managed_policy_arns = [aws_iam_policy.scheduler_ec2_policy.arn]
-
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -87,4 +85,9 @@ resource "aws_iam_role" "scheduler_ec2_role" {
       },
     ]
   })
+}
+
+resource "aws_iam_role_policy_attachment" "scheduler_ec2" {
+  role       = aws_iam_role.scheduler_ec2_role.name
+  policy_arn = aws_iam_policy.scheduler_ec2_policy.arn
 }

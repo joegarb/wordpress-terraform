@@ -12,7 +12,7 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.this.id]
   iam_instance_profile   = aws_iam_instance_profile.this.name
-  user_data              = data.cloudinit_config.this.rendered
+  user_data_base64       = data.cloudinit_config.this.rendered
 }
 
 data "cloudinit_config" "this" {
