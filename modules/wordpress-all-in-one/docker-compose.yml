@@ -1,5 +1,3 @@
-version: '3.1'
-
 services:
 
   wordpress:
@@ -36,7 +34,7 @@ services:
 
   nginx-proxy:
     container_name: nginx-proxy
-    image: jwilder/nginx-proxy
+    image: nginxproxy/nginx-proxy
     restart: unless-stopped
     ports:
       - 80:80
@@ -48,12 +46,14 @@ services:
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - /home/ec2-user/nginx-proxy.conf:/etc/nginx/conf.d/custom.conf:ro
     labels:
-      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
+      - com.github.nginx-proxy.nginx-proxy
 
   nginx-proxy-companion:
     container_name: nginx-proxy-companion
-    image: jrcs/letsencrypt-nginx-proxy-companion
+    image: nginxproxy/acme-companion
     restart: unless-stopped
+    environment:
+      DEFAULT_EMAIL: ${letsencrypt_email}
     volumes_from:
       - nginx-proxy
     volumes:

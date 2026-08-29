@@ -2,6 +2,8 @@ module "environment" {
   source = "../../../modules/wordpress-all-in-one"
 
   site_domain             = var.site_domain
+  hosted_zone_name        = var.hosted_zone_name
+  enable_public_ssh       = var.enable_public_ssh
   letsencrypt_email       = var.letsencrypt_email
   environment             = var.environment
   tags                    = var.tags

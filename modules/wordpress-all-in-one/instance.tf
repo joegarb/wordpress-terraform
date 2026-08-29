@@ -1,9 +1,9 @@
 resource "aws_instance" "this" {
   tags = (merge(
     {
-      "Name"          = "${var.environment}",
-      "AUTO_DNS_NAME" = "${var.site_domain}",
-      "AUTO_DNS_ZONE" = "${aws_route53_record.this.zone_id}"
+      "Name"          = var.environment,
+      "AUTO_DNS_NAME" = var.site_domain,
+      "AUTO_DNS_ZONE" = aws_route53_record.this.zone_id
     },
     var.tags
   ))
@@ -12,7 +12,20 @@ resource "aws_instance" "this" {
   key_name               = var.key_name
   vpc_security_group_ids = [aws_security_group.this.id]
   iam_instance_profile   = aws_iam_instance_profile.this.name
-  user_data              = data.cloudinit_config.this.rendered
+  user_data_base64       = data.cloudinit_config.this.rendered
+
+  root_block_device {
+    encrypted = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 data "cloudinit_config" "this" {
@@ -78,63 +91,92 @@ data "aws_ami" "this" {
   most_recent = true
 }
 
+# AWS-managed prefix list for the EC2 Instance Connect service, so port 22 can be
+# reached via EC2 Instance Connect without opening SSH to the whole internet.
+data "aws_region" "current" {}
+
+data "aws_ec2_managed_prefix_list" "ec2_instance_connect" {
+  name = "com.amazonaws.${data.aws_region.current.region}.ec2-instance-connect"
+}
+
 locals {
-  ingress = [{
-    port        = 443
-    description = "Port 443 HTTPS"
-    protocol    = "tcp"
-    },
-    {
-      port        = 80
-      description = "Port 80 HTTP"
-      protocol    = "tcp"
-    },
-    {
-      port        = 22
-      description = "Port 22 SSH"
-      protocol    = "tcp"
-    },
-    {
-      port        = 2222
-      description = "Port 2222 SFTP"
-      protocol    = "tcp"
-    }
-  ]
+  # Ports open to the public internet (IPv4 and IPv6).
+  public_ingress = {
+    https = { port = 443, description = "Port 443 HTTPS" }
+    http  = { port = 80, description = "Port 80 HTTP" }
+    sftp  = { port = 2222, description = "Port 2222 SFTP" }
+  }
 }
 
 resource "aws_security_group" "this" {
   name        = var.environment
   tags        = var.tags
-  description = "Allow HTTP/HTTPS/SSH inbound traffic"
+  description = "Allow HTTP/HTTPS/SSH/SFTP inbound traffic"
+}
 
-  dynamic "ingress" {
-    for_each = local.ingress
-    content {
-      description      = ingress.value.description
-      from_port        = ingress.value.port
-      to_port          = ingress.value.port
-      protocol         = ingress.value.protocol
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  }
+resource "aws_vpc_security_group_ingress_rule" "public_ipv4" {
+  for_each          = local.public_ingress
+  security_group_id = aws_security_group.this.id
+  description       = each.value.description
+  ip_protocol       = "tcp"
+  from_port         = each.value.port
+  to_port           = each.value.port
+  cidr_ipv4         = "0.0.0.0/0"
+}
 
-  egress = [
-    {
-      description      = "Outgoing - ALL"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  ]
+resource "aws_vpc_security_group_ingress_rule" "public_ipv6" {
+  for_each          = local.public_ingress
+  security_group_id = aws_security_group.this.id
+  description       = each.value.description
+  ip_protocol       = "tcp"
+  from_port         = each.value.port
+  to_port           = each.value.port
+  cidr_ipv6         = "::/0"
+}
+
+# SSH via the EC2 Instance Connect service only (no public exposure).
+resource "aws_vpc_security_group_ingress_rule" "ssh_instance_connect" {
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH via EC2 Instance Connect"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
+}
+
+# Optional public SSH from anywhere, gated by var.enable_public_ssh.
+resource "aws_vpc_security_group_ingress_rule" "ssh_public_ipv4" {
+  count             = var.enable_public_ssh ? 1 : 0
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH (public)"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ssh_public_ipv6" {
+  count             = var.enable_public_ssh ? 1 : 0
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH (public)"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv6         = "::/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_ipv4" {
+  security_group_id = aws_security_group.this.id
+  description       = "Outgoing - ALL"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_ipv6" {
+  security_group_id = aws_security_group.this.id
+  description       = "Outgoing - ALL"
+  ip_protocol       = "-1"
+  cidr_ipv6         = "::/0"
 }
 
 resource "random_password" "db_password" {
@@ -214,15 +256,13 @@ resource "aws_iam_role" "this" {
   })
 }
 
-resource "aws_iam_policy_attachment" "policy_attachment_ec2_update_ip" {
-  name       = var.environment
-  roles      = [aws_iam_role.this.name]
+resource "aws_iam_role_policy_attachment" "ec2_update_ip" {
+  role       = aws_iam_role.this.name
   policy_arn = aws_iam_policy.ec2_update_ip.arn
 }
 
-resource "aws_iam_policy_attachment" "policy_attachment_ec2_ecr" {
-  name       = var.environment
-  roles      = [aws_iam_role.this.name]
+resource "aws_iam_role_policy_attachment" "ec2_ecr" {
+  role       = aws_iam_role.this.name
   policy_arn = aws_iam_policy.ec2_ecr_policy.arn
 }
 

@@ -1,0 +1,5 @@
+# WordPress instances need broad outbound access (OS package repos, Docker Hub/ECR
+# image pulls, Let's Encrypt ACME, the Route 53 API), all via CDNs with rotating IPs.
+# The security group egress is therefore intentionally open to 0.0.0.0/0, so we accept
+# the unrestricted-egress finding rather than maintain an impractical CIDR allowlist.
+AVD-AWS-0104

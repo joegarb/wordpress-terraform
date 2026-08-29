@@ -12,7 +12,7 @@ Enable SSL by setting the letsencrypt_email variable before applying. Or after a
 
 One option for shell access is to use EC2 Instance Connect.
 
-Or if you specified a key_name, connect with ssh like:
+Or if you enabled SSH with the enable_public_ssh variable and specified a key_name, connect with ssh like:
 
 ```
 ssh -i {private_key} ec2-user@{site_domain}
@@ -20,7 +20,7 @@ ssh -i {private_key} ec2-user@{site_domain}
 
 ### SQL
 
-Remote SQL access is available using SSH tunneling.
+Remote SQL access is available using SSH tunneling (requires `enable_public_ssh = true`; see SSH above).
 
 Create tunnel:
 ```
