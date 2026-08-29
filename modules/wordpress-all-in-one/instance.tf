@@ -1,9 +1,9 @@
 resource "aws_instance" "this" {
   tags = (merge(
     {
-      "Name"          = "${var.environment}",
-      "AUTO_DNS_NAME" = "${var.site_domain}",
-      "AUTO_DNS_ZONE" = "${aws_route53_record.this.zone_id}"
+      "Name"          = var.environment,
+      "AUTO_DNS_NAME" = var.site_domain,
+      "AUTO_DNS_ZONE" = aws_route53_record.this.zone_id
     },
     var.tags
   ))

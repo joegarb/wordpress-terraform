@@ -15,7 +15,7 @@ resource "aws_scheduler_schedule" "ec2_start_schedule" {
 
     input = jsonencode({
       "InstanceIds" : [
-        "${aws_instance.this.id}"
+        aws_instance.this.id
       ]
     })
   }
@@ -38,7 +38,7 @@ resource "aws_scheduler_schedule" "ec2_stop_schedule" {
 
     input = jsonencode({
       "InstanceIds" : [
-        "${aws_instance.this.id}"
+        aws_instance.this.id
       ]
     })
   }
@@ -60,7 +60,7 @@ resource "aws_iam_policy" "scheduler_ec2_policy" {
           ],
           "Resource" : [
             "${aws_instance.this.arn}:*",
-            "${aws_instance.this.arn}"
+            aws_instance.this.arn
           ],
         }
       ]
