@@ -13,6 +13,15 @@ resource "aws_instance" "this" {
   vpc_security_group_ids = [aws_security_group.this.id]
   iam_instance_profile   = aws_iam_instance_profile.this.name
   user_data_base64       = data.cloudinit_config.this.rendered
+
+  root_block_device {
+    encrypted = true
+  }
+
+  metadata_options {
+    http_endpoint = "enabled"
+    http_tokens   = "required"
+  }
 }
 
 data "cloudinit_config" "this" {
