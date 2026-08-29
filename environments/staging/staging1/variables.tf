@@ -1,3 +1,9 @@
+variable "region" {
+  description = "AWS region to deploy into"
+  type        = string
+  default     = "us-east-1"
+}
+
 variable "environment" {
   description = "Environment name which will be prefixed on all the resources to be created"
   type        = string
@@ -22,11 +28,9 @@ variable "enable_public_ssh" {
 }
 
 variable "tags" {
-  description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
+  description = "Extra AWS tags to add to resources created by the module. Common tags (stage, ManagedBy) are applied to every resource via the provider's default_tags."
   type        = map(any)
-  default = {
-    stage = "staging"
-  }
+  default     = {}
 }
 
 variable "instance_type" {
