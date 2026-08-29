@@ -22,6 +22,10 @@ resource "aws_instance" "this" {
     http_endpoint = "enabled"
     http_tokens   = "required"
   }
+
+  lifecycle {
+    ignore_changes = [ami]
+  }
 }
 
 data "cloudinit_config" "this" {
@@ -252,15 +256,13 @@ resource "aws_iam_role" "this" {
   })
 }
 
-resource "aws_iam_policy_attachment" "policy_attachment_ec2_update_ip" {
-  name       = var.environment
-  roles      = [aws_iam_role.this.name]
+resource "aws_iam_role_policy_attachment" "ec2_update_ip" {
+  role       = aws_iam_role.this.name
   policy_arn = aws_iam_policy.ec2_update_ip.arn
 }
 
-resource "aws_iam_policy_attachment" "policy_attachment_ec2_ecr" {
-  name       = var.environment
-  roles      = [aws_iam_role.this.name]
+resource "aws_iam_role_policy_attachment" "ec2_ecr" {
+  role       = aws_iam_role.this.name
   policy_arn = aws_iam_policy.ec2_ecr_policy.arn
 }
 
