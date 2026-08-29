@@ -6,6 +6,12 @@ variable "site_domain" {
   description = "The primary domain name of the website"
 }
 
+variable "enable_public_ssh" {
+  description = "When true, opens port 22 (SSH) to the internet (0.0.0.0/0). Defaults to false so there is no public SSH ingress."
+  type        = bool
+  default     = false
+}
+
 variable "hosted_zone_name" {
   description = "Name of the existing Route 53 hosted zone that serves DNS for site_domain. Defaults to the apex/registered domain derived from site_domain (e.g. \"cloud.example.com\" => \"example.com\"). Set this to site_domain itself when you delegate the subdomain to its own hosted zone."
   type        = string

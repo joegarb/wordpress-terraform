@@ -87,6 +87,14 @@ data "aws_ami" "this" {
   most_recent = true
 }
 
+# AWS-managed prefix list for the EC2 Instance Connect service, so port 22 can be
+# reached via EC2 Instance Connect without opening SSH to the whole internet.
+data "aws_region" "current" {}
+
+data "aws_ec2_managed_prefix_list" "ec2_instance_connect" {
+  name = "com.amazonaws.${data.aws_region.current.region}.ec2-instance-connect"
+}
+
 locals {
   ingress = [{
     port        = 443
@@ -117,7 +125,7 @@ resource "aws_security_group" "this" {
   description = "Allow HTTP/HTTPS/SSH inbound traffic"
 
   dynamic "ingress" {
-    for_each = local.ingress
+    for_each = [for rule in local.ingress : rule if rule.port != 22 || var.enable_public_ssh]
     content {
       description      = ingress.value.description
       from_port        = ingress.value.port
@@ -129,6 +137,14 @@ resource "aws_security_group" "this" {
       security_groups  = []
       self             = false
     }
+  }
+
+  ingress {
+    description     = "Port 22 SSH via EC2 Instance Connect"
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    prefix_list_ids = [data.aws_ec2_managed_prefix_list.ec2_instance_connect.id]
   }
 
   egress = [

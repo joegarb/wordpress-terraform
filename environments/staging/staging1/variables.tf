@@ -13,6 +13,12 @@ variable "hosted_zone_name" {
   default     = null
 }
 
+variable "enable_public_ssh" {
+  description = "When true, opens port 22 (SSH) to the internet (0.0.0.0/0). Defaults to false so there is no public SSH ingress."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "AWS Tags to add to all resources created (where possible); see https://aws.amazon.com/answers/account-management/aws-tagging-strategies/"
   type        = map(any)
