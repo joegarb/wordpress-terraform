@@ -96,70 +96,83 @@ data "aws_ec2_managed_prefix_list" "ec2_instance_connect" {
 }
 
 locals {
-  ingress = [{
-    port        = 443
-    description = "Port 443 HTTPS"
-    protocol    = "tcp"
-    },
-    {
-      port        = 80
-      description = "Port 80 HTTP"
-      protocol    = "tcp"
-    },
-    {
-      port        = 22
-      description = "Port 22 SSH"
-      protocol    = "tcp"
-    },
-    {
-      port        = 2222
-      description = "Port 2222 SFTP"
-      protocol    = "tcp"
-    }
-  ]
+  # Ports open to the public internet (IPv4 and IPv6).
+  public_ingress = {
+    https = { port = 443, description = "Port 443 HTTPS" }
+    http  = { port = 80, description = "Port 80 HTTP" }
+    sftp  = { port = 2222, description = "Port 2222 SFTP" }
+  }
 }
 
 resource "aws_security_group" "this" {
   name        = var.environment
   tags        = var.tags
-  description = "Allow HTTP/HTTPS/SSH inbound traffic"
+  description = "Allow HTTP/HTTPS/SSH/SFTP inbound traffic"
+}
 
-  dynamic "ingress" {
-    for_each = [for rule in local.ingress : rule if rule.port != 22 || var.enable_public_ssh]
-    content {
-      description      = ingress.value.description
-      from_port        = ingress.value.port
-      to_port          = ingress.value.port
-      protocol         = ingress.value.protocol
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  }
+resource "aws_vpc_security_group_ingress_rule" "public_ipv4" {
+  for_each          = local.public_ingress
+  security_group_id = aws_security_group.this.id
+  description       = each.value.description
+  ip_protocol       = "tcp"
+  from_port         = each.value.port
+  to_port           = each.value.port
+  cidr_ipv4         = "0.0.0.0/0"
+}
 
-  ingress {
-    description     = "Port 22 SSH via EC2 Instance Connect"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    prefix_list_ids = [data.aws_ec2_managed_prefix_list.ec2_instance_connect.id]
-  }
+resource "aws_vpc_security_group_ingress_rule" "public_ipv6" {
+  for_each          = local.public_ingress
+  security_group_id = aws_security_group.this.id
+  description       = each.value.description
+  ip_protocol       = "tcp"
+  from_port         = each.value.port
+  to_port           = each.value.port
+  cidr_ipv6         = "::/0"
+}
 
-  egress = [
-    {
-      description      = "Outgoing - ALL"
-      from_port        = 0
-      to_port          = 0
-      protocol         = "-1"
-      cidr_blocks      = ["0.0.0.0/0"]
-      ipv6_cidr_blocks = ["::/0"]
-      prefix_list_ids  = []
-      security_groups  = []
-      self             = false
-    }
-  ]
+# SSH via the EC2 Instance Connect service only (no public exposure).
+resource "aws_vpc_security_group_ingress_rule" "ssh_instance_connect" {
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH via EC2 Instance Connect"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.ec2_instance_connect.id
+}
+
+# Optional public SSH from anywhere, gated by var.enable_public_ssh.
+resource "aws_vpc_security_group_ingress_rule" "ssh_public_ipv4" {
+  count             = var.enable_public_ssh ? 1 : 0
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH (public)"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_ingress_rule" "ssh_public_ipv6" {
+  count             = var.enable_public_ssh ? 1 : 0
+  security_group_id = aws_security_group.this.id
+  description       = "Port 22 SSH (public)"
+  ip_protocol       = "tcp"
+  from_port         = 22
+  to_port           = 22
+  cidr_ipv6         = "::/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_ipv4" {
+  security_group_id = aws_security_group.this.id
+  description       = "Outgoing - ALL"
+  ip_protocol       = "-1"
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
+resource "aws_vpc_security_group_egress_rule" "all_ipv6" {
+  security_group_id = aws_security_group.this.id
+  description       = "Outgoing - ALL"
+  ip_protocol       = "-1"
+  cidr_ipv6         = "::/0"
 }
 
 resource "random_password" "db_password" {
