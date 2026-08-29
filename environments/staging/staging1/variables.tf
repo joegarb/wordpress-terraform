@@ -63,6 +63,7 @@ variable "db_password" {
   description = "Database password for WordPress"
   type        = string
   default     = null
+  sensitive   = true
 }
 
 variable "wp_debug" {
@@ -117,4 +118,5 @@ variable "sftp_password" {
   description = "SFTP password"
   type        = string
   default     = null
+  sensitive   = true
 }

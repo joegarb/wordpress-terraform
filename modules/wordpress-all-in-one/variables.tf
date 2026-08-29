@@ -6,6 +6,11 @@ variable "environment" {
 variable "site_domain" {
   description = "The primary domain name of the website"
   type        = string
+
+  validation {
+    condition     = can(regex("^[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$", var.site_domain))
+    error_message = "site_domain must be a valid domain name, e.g. \"example.com\" or \"cloud.example.com\"."
+  }
 }
 
 variable "enable_public_ssh" {
@@ -42,6 +47,11 @@ variable "letsencrypt_email" {
   description = "Email address required to obtain a SSL cert from Lets Encrypt. If not specified, SSL will be disabled"
   type        = string
   default     = null
+
+  validation {
+    condition     = var.letsencrypt_email == null || can(regex("^[^@[:space:]]+@[^@[:space:]]+\\.[^@[:space:]]+$", var.letsencrypt_email))
+    error_message = "letsencrypt_email must be a valid email address."
+  }
 }
 
 variable "image" {
@@ -60,6 +70,7 @@ variable "db_password" {
   description = "Database password for WordPress"
   type        = string
   default     = null
+  sensitive   = true
 }
 
 variable "wp_debug" {
@@ -114,4 +125,5 @@ variable "sftp_password" {
   description = "SFTP password"
   type        = string
   default     = null
+  sensitive   = true
 }
